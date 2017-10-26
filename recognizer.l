@@ -210,7 +210,14 @@ int term() {
 
     if(factor()) {
 
-        return 1;
+        if(rb()) {
+            
+            return 1;
+
+        } else {
+
+            return 0;
+        }
 
     } else {
 
@@ -223,7 +230,7 @@ int factor() {
     if(reading == ID) {
         
         reading = yylex();
-
+        
         return 1;
 
     } else if(reading == NUM) {
@@ -235,6 +242,53 @@ int factor() {
     } else {
 
         return 0;
+    }
+}
+
+int rb() {
+
+    if(reading == MULTIPLIER) {
+
+        reading = yylex();
+        
+        if(factor()) {
+
+            if(rb()) {
+
+                return 1;
+
+            } else {
+
+                return 0;
+
+            }
+
+        } else {
+
+            return 0;
+        }
+    } else if(reading == DIVISOR) {
+        
+        reading = yylex();
+
+        if(factor()) {
+
+            if(rb()) {
+
+                return 1;
+
+            } else {
+
+                return 0;
+            }
+        } else {
+
+            return 0;
+        }
+    }
+
+    else {
+        return 1;
     }
 }
 
