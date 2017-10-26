@@ -1,5 +1,6 @@
 %{ 
-#define PROGRAM 1
+#define INVALID 0
+#define VALID 1
 #define ID 2
 #define MY_BEGIN 3
 #define END 4
@@ -20,7 +21,11 @@
 #define MULTIPLIER 19
 #define DIVISOR 20
 #define SEMICOLON 21
-#define INVALID 22
+#define LESS_THAN 22
+#define GREATER_THAN 23
+#define EQUAL_TO 24
+#define INVALID_CHAR 25
+#define PROGRAM 26
 %}
 
 
@@ -72,9 +77,15 @@ endfor { return ENDFOR; }
 
 [;] { return SEMICOLON; }
 
+[>] { return GREATER_THAN; }
+
+[<] { return LESS_THAN; }
+
+[=] { return EQUAL_TO; }
+
 [ \t\n]+ {;}
 
-. { return INVALID; }
+. { return INVALID_CHAR; }
 
 %%
 
@@ -117,31 +128,31 @@ int prog() {
                     
                     if(reading == END) {
                     
-                        return 1;
+                        return VALID;
 
                     } else {
                         
-                        return 0;
+                        return INVALID;
                     }
 
                 } else {
 
-                    return 0;
+                    return INVALID;
                 }
 
             } else {
 
-                return 0;
+                return INVALID;
             }
 
         } else {
             
-            return 0;
+            return INVALID;
         }
 
     } else {
 
-        return 0;
+        return INVALID;
     }
 }
 
@@ -149,11 +160,11 @@ int opt_stmts() {
 
     if(stmt_list()) {
         
-        return 1;
+        return VALID;
 
     } else {
 
-        return 0;
+        return VALID;
     }
 }
 
@@ -161,11 +172,11 @@ int stmt_list() {
 
     if(stmt()) {
 
-        return 1;
+        return VALID;
 
     } else {
 
-        return 0;
+        return INVALID;
     }
 }
 
@@ -181,16 +192,56 @@ int stmt() {
 
             if(expr()) {
 
-                return 1;
+                return VALID;
 
             } else {
 
-                return 0;
+                return INVALID;
             }
         }
 
+    } else if(reading == IF) {
+        
+        reading = yylex();
+
+        if(expresion()) {
+
+            if(reading == THEN) {
+
+                reading = yylex();
+
+                if(opt_stmts()) {
+
+                    if(reading == ENDIF) {
+
+                        reading = yylex();
+
+                        return VALID;
+
+                    } else {
+
+                        return INVALID;
+                    }
+
+                } else {
+
+                    return INVALID;
+                }
+
+            } else {
+
+                return INVALID;
+            }
+
+        } else {
+
+            return INVALID;
+        }
+
+
+
     } else {
-        return 0;
+
     }
 }
 
@@ -200,16 +251,16 @@ int expr() {
 
         if(ra()) {
 
-            return 1;
+            return VALID;
 
         } else {
 
-            return 0;
+            return INVALID;
         }
 
     } else {
 
-        return 0;
+        return INVALID;
     }
 }
 
@@ -219,16 +270,16 @@ int term() {
 
         if(rb()) {
             
-            return 1;
+            return VALID;
 
         } else {
 
-            return 0;
+            return INVALID;
         }
 
     } else {
 
-        return 0;
+        return INVALID;
     }
 }
 
@@ -238,13 +289,13 @@ int factor() {
         
         reading = yylex();
         
-        return 1;
+        return VALID;
 
     } else if(reading == NUM) {
        
         reading = yylex();
 
-        return 1;
+        return VALID;
 
     } else if(reading == OPEN_PARENTHESIS) {
 
@@ -256,23 +307,23 @@ int factor() {
                 
                 reading = yylex();
 
-                return 1;
+                return VALID;
 
             } else {
-                
-                return 0;
+
+                return INVALID;
 
             }
 
 
         } else {
 
-            return 0;
+            return INVALID;
         }
 
     } else {
 
-        return 0;
+        return INVALID;
     }
 }
 
@@ -286,17 +337,17 @@ int rb() {
 
             if(rb()) {
 
-                return 1;
+                return VALID;
 
             } else {
 
-                return 0;
+                return INVALID;
 
             }
 
         } else {
 
-            return 0;
+            return INVALID;
         }
     } else if(reading == DIVISOR) {
         
@@ -306,20 +357,20 @@ int rb() {
 
             if(rb()) {
 
-                return 1;
+                return VALID;
 
             } else {
 
-                return 0;
+                return INVALID;
             }
         } else {
 
-            return 0;
+            return INVALID;
         }
     }
 
     else {
-        return 1;
+        return VALID;
     }
 }
 
@@ -332,16 +383,16 @@ int ra() {
 
             if(ra()) {
                 
-                return 1;
+                return VALID;
 
             } else {
 
-                return 0;
+                return INVALID;
             }
 
         } else {
 
-            return 0;
+            return INVALID;
         }
 
     } else if(reading == MINUS) {
@@ -352,22 +403,50 @@ int ra() {
 
             if(ra()) {
                 
-                return 1;
+                return VALID;
 
             } else {
 
-                return 0;
+                return INVALID;
             }
 
         } else {
 
-            return 0;
+            return INVALID;
         }
 
     } else {
 
-        return 1;
+        return VALID;
     }
+}
+
+int expresion() {
+
+    if(expr()) {
+
+        if(reading == GREATER_THAN || reading  == LESS_THAN || reading == EQUAL_TO) {
+
+            reading = yylex();
+
+            if(expr()) {
+                return VALID;
+                
+            } else {
+
+                return INVALID;
+            }
+
+        } else {
+
+            return INVALID;
+        }
+
+    } else {
+
+        return INVALID;
+    }
+
 }
 
 int main() {
@@ -384,5 +463,5 @@ int main() {
 
         printf("no\n");
     }
-    return 0;
+    return INVALID;
 }
