@@ -61,7 +61,7 @@ endfor { return ENDFOR; }
 
 {IDENTIFIER} { return ID; }
 
-({DIGITOSC}({DIGITO}*)) { return NUM; }
+0|({DIGITOSC}({DIGITO}*)) { return NUM; }
 
 [(] { return OPEN_PARENTHESIS; }
 
@@ -163,7 +163,7 @@ int opt_stmts() {
 
     } else {
         
-        return INVALID;
+        return VALID;
 
     }
 }
@@ -199,7 +199,7 @@ int stmt() {
 
                 return INVALID;
             }
-            
+
         } else {
 
             return INVALID;
@@ -244,10 +244,103 @@ int stmt() {
             return INVALID;
         }
 
+    } else if(reading == FOR) {
+
+        reading = yylex();
+
+        if(reading == ID) {
+
+            reading = yylex();
+
+            if(reading == ASSIGN) {
+
+                reading = yylex();
+
+                if(expr()) {
+
+                    if(reading == STEP) {
+
+                        reading = yylex();
+
+                        if(expr()) {
+
+                            if(reading == UNTIL) {
+
+                                reading = yylex();
+
+                                if(expr()) {
+
+                                    if(reading == DO) {
+
+                                        reading = yylex();
+
+                                        if(opt_stmts()) {
+
+                                            reading = yylex();
+
+                                            if(reading == ENDFOR) {
+
+                                                return VALID;
+
+                                            } else {
+
+                                                return INVALID;
+
+                                            }
+
+                                        } else {
+
+                                            return INVALID;
+
+                                        }
+
+                                    } else {
+
+                                        return INVALID;
+
+                                    }
+
+                                } else {
+
+                                    return INVALID;
+
+                                }
+
+                            }
+
+                        } else {
+
+                            return INVALID;
+
+                        }
+
+                    } else {
+
+                        return INVALID;
+
+                    }
+
+                } else {
+
+                    return INVALID;
+
+                }
+
+            } else {
+
+                return INVALID;
+
+            }
+
+        } else {
+
+            return INVALID;
+        }
+
+
     } else {
 
-        return INVALID;
-
+         return INVALID;
     }
 }
 
