@@ -13,6 +13,14 @@
 #define DO 12
 #define ENDFOR 13
 #define NUM 14
+#define OPEN_PARENTHESIS 15
+#define CLOSE_PARENTHESIS 16
+#define PLUS 17
+#define MINUS 18
+#define MULTIPLIER 19
+#define DIVISOR 20
+#define SEMICOLON 21
+#define INVALID 22
 %}
 
 
@@ -50,9 +58,23 @@ endfor { return ENDFOR; }
 
 ({DIGITOSC}({DIGITO}*)) { return NUM; }
 
+[(] { return OPEN_PARENTHESIS; }
+
+[)] { return CLOSE_PARENTHESIS; }
+
+[+] { return PLUS; }
+
+[-] { return MINUS; }
+
+[*] { return MULTIPLIER; }
+
+[\/] { return DIVISOR; }
+
+[;] { return SEMICOLON; }
+
 [ \t\n]+ {;}
 
-. {printf("INVALID CHARACTER");}
+. { return INVALID; }
 
 %%
 
@@ -61,25 +83,23 @@ endfor { return ENDFOR; }
 
 //global variables
 int reading;
-
+int error;
 
 //function declarations
-void error();
-void success();
-void prog();
-void opt_stmts();
+int success();
+int prog();
+int opt_stmts();
+int stmt_list();
+int stmt();
+int expr();
+int term();
+int ra();
+int factor();
+int rb();
+int expresion();
 
-void error() {
-    
-    printf("Invalid Program\n");
-}
 
-void success() {
-
-    printf("Valid Program\n");
-}
-
-void prog() {
+int prog() {
     
     if(reading == PROGRAM) {
         
@@ -90,50 +110,147 @@ void prog() {
             reading = yylex();
 
             if(reading == MY_BEGIN) {
-
-                reading = yylex();
                 
-                opt_stmts();
+                reading = yylex();
 
-                if(reading == END) {
+                if(opt_stmts()) {
                     
-                    success();
-                }
-                else {
+                    if(reading == END) {
                     
-                    error();
-                }
-            }
-            else {
+                        return 1;
 
-                error();
+                    } else {
+                        
+                        return 0;
+                    }
+
+                } else {
+
+                    return 0;
+                }
+
+            } else {
+
+                return 0;
             }
-        }
-        else {
+
+        } else {
             
-            error();
+            return 0;
         }
-    }
-    else {
 
-        error();
+    } else {
+
+        return 0;
     }
 }
 
-void opt_stmts() {
-    
-    if(reading == END) {
-        //continue
-    }
-    else {
+int opt_stmts() {
 
-        printf("To be continued...");
+    if(stmt_list()) {
+        
+        return 1;
+
+    } else {
+
+        return 0;
+    }
+}
+
+int stmt_list() {
+
+    if(stmt()) {
+
+        return 1;
+
+    } else {
+
+        return 0;
+    }
+}
+
+int stmt() {
+
+    if(reading == ID) {
+
+        reading = yylex();
+        
+        if(reading == ASSIGN) {
+
+            reading = yylex();
+
+            if(expr()) {
+
+                return 1;
+
+            } else {
+
+                return 0;
+            }
+        }
+
+    } else {
+        return 0;
+    }
+}
+
+int expr() {
+
+    if(term()) {
+
+        return 1;
+
+    } else {
+
+        return 0;
+    }
+}
+
+int term() {
+
+    if(factor()) {
+
+        return 1;
+
+    } else {
+
+        return 0;
+    }
+}
+
+int factor() {
+
+    if(reading == ID) {
+        
+        reading = yylex();
+
+        return 1;
+
+    } else if(reading == NUM) {
+       
+        reading = yylex();
+
+        return 1;
+
+    } else {
+
+        return 0;
     }
 }
 
 int main() {
 
     reading = yylex();
-    prog();
+
+    int valid = prog();
+
+    if(valid) {
+        
+        printf("si\n");
+
+    } else {
+
+        printf("no\n");
+    }
     return 0;
 }
