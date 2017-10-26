@@ -1,34 +1,30 @@
-{%
-    const int PROGRAM = 1;
-    const int ID = 2;
-    const int BEGIN = 3;
-    const int END = 4;
-    const int IF = 5;
-    const int THEN = 6;
-    const int ENDIF = 7;
-    const int FOR = 8;
-    const int ASSIGN = 9;
-    const int STEP = 10;
-    const int UNTIL = 11;
-    const int DO = 12;
-    const int ENDFOR = 13;
-    const int NUM = 14;
+%{ 
+#define PROGRAM 1
+#define ID 2
+#define MY_BEGIN 3
+#define END 4
+#define IF 5
+#define THEN 6
+#define ENDIF 7
+#define FOR 8
+#define ASSIGN 9
+#define STEP 10
+#define UNTIL 11
+#define DO 12
+#define ENDFOR 13
+#define NUM 14
 %}
 
-LETRA [a-z,A-Z]
+
 DIGITO [0-9]
 DIGITOSC [1-9]
-
+IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-{LETRA}({DIGITO}|{LETRA}*) { return ID; }
-
-{DIGITOSC}{DIGITO}* { return NUM; }
+begin { return MY_BEGIN; }
 
 program { return PROGRAM; }
-
-begin { return BEGIN; }
 
 end { return END; }
 
@@ -50,10 +46,94 @@ do { return DO; }
 
 endfor { return ENDFOR; }
 
+{IDENTIFIER} { return ID; }
 
-[ \t\n]+
+({DIGITOSC}({DIGITO}*)) { return NUM; }
+
+[ \t\n]+ {;}
+
+. {printf("INVALID CHARACTER");}
 
 %%
 
+
+#include <stdio.h>
+
+//global variables
+int reading;
+
+
+//function declarations
+void error();
+void success();
+void prog();
+void opt_stmts();
+
+void error() {
+    
+    printf("Invalid Program\n");
+}
+
+void success() {
+
+    printf("Valid Program\n");
+}
+
+void prog() {
+    
+    if(reading == PROGRAM) {
+        
+        reading = yylex();
+
+        if(reading == ID) {
+
+            reading = yylex();
+
+            if(reading == MY_BEGIN) {
+
+                reading = yylex();
+                
+                opt_stmts();
+
+                if(reading == END) {
+                    
+                    success();
+                }
+                else {
+                    
+                    error();
+                }
+            }
+            else {
+
+                error();
+            }
+        }
+        else {
+            
+            error();
+        }
+    }
+    else {
+
+        error();
+    }
+}
+
+void opt_stmts() {
+    
+    if(reading == END) {
+        //continue
+    }
+    else {
+
+        printf("To be continued...");
+    }
+}
+
 int main() {
+
+    reading = yylex();
+    prog();
+    return 0;
 }
