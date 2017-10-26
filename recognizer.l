@@ -125,7 +125,7 @@ int prog() {
                 reading = yylex();
 
                 if(opt_stmts()) {
-                    
+
                     if(reading == END) {
                     
                         return VALID;
@@ -136,7 +136,6 @@ int prog() {
                     }
 
                 } else {
-
                     return INVALID;
                 }
 
@@ -163,8 +162,9 @@ int opt_stmts() {
         return VALID;
 
     } else {
+        
+        return INVALID;
 
-        return VALID;
     }
 }
 
@@ -177,6 +177,7 @@ int stmt_list() {
     } else {
 
         return INVALID;
+        
     }
 }
 
@@ -187,7 +188,7 @@ int stmt() {
         reading = yylex();
         
         if(reading == ASSIGN) {
-
+            
             reading = yylex();
 
             if(expr()) {
@@ -198,6 +199,11 @@ int stmt() {
 
                 return INVALID;
             }
+            
+        } else {
+
+            return INVALID;
+
         }
 
     } else if(reading == IF) {
@@ -238,9 +244,9 @@ int stmt() {
             return INVALID;
         }
 
-
-
     } else {
+
+        return INVALID;
 
     }
 }
