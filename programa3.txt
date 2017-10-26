@@ -1,0 +1,13 @@
+program programa3
+begin
+   x:=10;
+   y:=0;
+   aux:=1;
+   for y := 1 step 1 until x do
+      aux := aux * 10;
+      x := x - 1
+   endfor;
+   if y < x then
+      y := x
+   endif
+end

@@ -1,0 +1,12 @@
+program programa2
+begin
+   x := 10;
+   if x < 20 then
+      x := 10;
+      y := 20
+   endif;
+   for x := 10 step 1 until y+z do
+      x := 10;
+      y := 20
+   endfor
+end
