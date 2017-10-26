@@ -83,9 +83,7 @@ endfor { return ENDFOR; }
 
 [=] { return EQUAL_TO; }
 
-[ \t\n]+ {;}
-
-. { return INVALID_CHAR; }
+[\n\t ] {;}
 
 %%
 
@@ -172,7 +170,24 @@ int stmt_list() {
 
     if(stmt()) {
 
-        return VALID;
+        if(reading == SEMICOLON) {
+
+            reading = yylex();
+
+            if(stmt_list()) {
+
+                return VALID;
+
+            } else {
+
+                return INVALID;
+            }
+
+        } else {
+
+            return VALID;
+
+        }
 
     } else {
 
@@ -276,9 +291,9 @@ int stmt() {
 
                                         if(opt_stmts()) {
 
-                                            reading = yylex();
-
                                             if(reading == ENDFOR) {
+
+                                                reading = yylex();
 
                                                 return VALID;
 
@@ -478,6 +493,7 @@ int ra() {
     if(reading == PLUS) {
 
         reading = yylex();
+        
         if(term()) {
 
             if(ra()) {
