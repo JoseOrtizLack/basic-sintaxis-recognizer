@@ -443,7 +443,7 @@ int factor() {
 
 int rb() {
 
-    if(reading == MULTIPLIER) {
+    if(reading == MULTIPLIER || reading == DIVISOR) {
 
         reading = yylex();
         
@@ -462,55 +462,19 @@ int rb() {
         } else {
 
             return INVALID;
+
         }
-    } else if(reading == DIVISOR) {
-        
-        reading = yylex();
-
-        if(factor()) {
-
-            if(rb()) {
-
-                return VALID;
-
-            } else {
-
-                return INVALID;
-            }
-        } else {
-
-            return INVALID;
-        }
-    }
+    } 
 
     else {
+
         return VALID;
     }
 }
 
 int ra() {
 
-    if(reading == PLUS) {
-
-        reading = yylex();
-        
-        if(term()) {
-
-            if(ra()) {
-                
-                return VALID;
-
-            } else {
-
-                return INVALID;
-            }
-
-        } else {
-
-            return INVALID;
-        }
-
-    } else if(reading == MINUS) {
+    if(reading == PLUS || reading == MINUS) {
 
         reading = yylex();
 
@@ -528,11 +492,13 @@ int ra() {
         } else {
 
             return INVALID;
+            
         }
 
     } else {
 
         return VALID;
+
     }
 }
 
@@ -545,21 +511,25 @@ int expresion() {
             reading = yylex();
 
             if(expr()) {
+
                 return VALID;
                 
             } else {
 
                 return INVALID;
+
             }
 
         } else {
 
             return INVALID;
+
         }
 
     } else {
 
         return INVALID;
+
     }
 
 }
@@ -578,5 +548,6 @@ int main() {
 
         printf("no\n");
     }
+
     return INVALID;
 }
