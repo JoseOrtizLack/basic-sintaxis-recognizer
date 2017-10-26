@@ -198,7 +198,14 @@ int expr() {
 
     if(term()) {
 
-        return 1;
+        if(ra()) {
+
+            return 1;
+
+        } else {
+
+            return 0;
+        }
 
     } else {
 
@@ -238,6 +245,30 @@ int factor() {
         reading = yylex();
 
         return 1;
+
+    } else if(reading == OPEN_PARENTHESIS) {
+
+        reading = yylex();
+
+        if(expr()) {
+
+            if(reading == CLOSE_PARENTHESIS) {
+                
+                reading = yylex();
+
+                return 1;
+
+            } else {
+                
+                return 0;
+
+            }
+
+
+        } else {
+
+            return 0;
+        }
 
     } else {
 
@@ -288,6 +319,53 @@ int rb() {
     }
 
     else {
+        return 1;
+    }
+}
+
+int ra() {
+
+    if(reading == PLUS) {
+
+        reading = yylex();
+        if(term()) {
+
+            if(ra()) {
+                
+                return 1;
+
+            } else {
+
+                return 0;
+            }
+
+        } else {
+
+            return 0;
+        }
+
+    } else if(reading == MINUS) {
+
+        reading = yylex();
+
+        if(term()) {
+
+            if(ra()) {
+                
+                return 1;
+
+            } else {
+
+                return 0;
+            }
+
+        } else {
+
+            return 0;
+        }
+
+    } else {
+
         return 1;
     }
 }
