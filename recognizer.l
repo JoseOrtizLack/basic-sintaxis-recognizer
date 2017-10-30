@@ -26,6 +26,7 @@
 #define EQUAL_TO 24
 #define INVALID_CHAR 25
 #define PROGRAM 26
+
 %}
 
 
@@ -87,12 +88,8 @@ endfor { return ENDFOR; }
 
 %%
 
-
+//include statements
 #include <stdio.h>
-
-//global variables
-int reading;
-int error;
 
 //function declarations
 int success();
@@ -107,6 +104,9 @@ int factor();
 int rb();
 int expresion();
 
+//global variables
+int reading;
+int error;
 
 int prog() {
     
@@ -122,7 +122,11 @@ int prog() {
                 
                 reading = yylex();
 
-                if(opt_stmts()) {
+                if(reading == END) {
+
+                    return VALID;
+
+                } else if(opt_stmts()) {
 
                     if(reading == END) {
                     
@@ -131,9 +135,11 @@ int prog() {
                     } else {
                         
                         return INVALID;
+
                     }
 
                 } else {
+
                     return INVALID;
                 }
 
@@ -160,8 +166,8 @@ int opt_stmts() {
         return VALID;
 
     } else {
-        
-        return VALID;
+
+        return INVALID;
 
     }
 }
@@ -179,7 +185,6 @@ int stmt_list() {
                 return VALID;
 
             } else {
-
                 return INVALID;
             }
 
