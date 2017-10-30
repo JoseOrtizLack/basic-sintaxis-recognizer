@@ -27,6 +27,26 @@
 #define INVALID_CHAR 25
 #define PROGRAM 26
 
+//include statements
+#include <stdio.h>
+
+//function declarations
+int success();
+int prog();
+int opt_stmts();
+int stmt_list();
+int stmt();
+int expr();
+int term();
+int ra();
+int factor();
+int rb();
+int expresion();
+
+//global variables
+int reading;
+int error;
+
 %}
 
 
@@ -87,26 +107,6 @@ endfor { return ENDFOR; }
 [\n\t ] {;}
 
 %%
-
-//include statements
-#include <stdio.h>
-
-//function declarations
-int success();
-int prog();
-int opt_stmts();
-int stmt_list();
-int stmt();
-int expr();
-int term();
-int ra();
-int factor();
-int rb();
-int expresion();
-
-//global variables
-int reading;
-int error;
 
 int prog() {
     
