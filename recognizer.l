@@ -44,14 +44,13 @@ int rb();
 int expresion();
 
 //global variables
-int reading;
-int error;
+int token;
 
 %}
 
 
-DIGITO [0-9]
-DIGITOSC [1-9]
+DIGIT [0-9]
+DIGITNZ [1-9] //Digit no zero
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 
 %%
@@ -82,7 +81,7 @@ endfor { return ENDFOR; }
 
 {IDENTIFIER} { return ID; }
 
-0|({DIGITOSC}({DIGITO}*)) { return NUM; }
+0|({DIGITNZ}({DIGIT}*)) { return NUM; }
 
 [(] { return OPEN_PARENTHESIS; }
 
@@ -110,25 +109,25 @@ endfor { return ENDFOR; }
 
 int prog() {
     
-    if(reading == PROGRAM) {
+    if(token == PROGRAM) {
         
-        reading = yylex();
+        token = yylex();
 
-        if(reading == ID) {
+        if(token == ID) {
 
-            reading = yylex();
+            token = yylex();
 
-            if(reading == MY_BEGIN) {
+            if(token == MY_BEGIN) {
                 
-                reading = yylex();
+                token = yylex();
 
-                if(reading == END) {
+                if(token == END) {
 
                     return VALID;
 
                 } else if(opt_stmts()) {
 
-                    if(reading == END) {
+                    if(token == END) {
                     
                         return VALID;
 
@@ -176,9 +175,9 @@ int stmt_list() {
 
     if(stmt()) {
 
-        if(reading == SEMICOLON) {
+        if(token == SEMICOLON) {
 
-            reading = yylex();
+            token = yylex();
 
             if(stmt_list()) {
 
@@ -203,13 +202,13 @@ int stmt_list() {
 
 int stmt() {
 
-    if(reading == ID) {
+    if(token == ID) {
 
-        reading = yylex();
+        token = yylex();
         
-        if(reading == ASSIGN) {
+        if(token == ASSIGN) {
             
-            reading = yylex();
+            token = yylex();
 
             if(expr()) {
 
@@ -226,21 +225,21 @@ int stmt() {
 
         }
 
-    } else if(reading == IF) {
+    } else if(token == IF) {
         
-        reading = yylex();
+        token = yylex();
 
         if(expresion()) {
 
-            if(reading == THEN) {
+            if(token == THEN) {
 
-                reading = yylex();
+                token = yylex();
 
                 if(opt_stmts()) {
 
-                    if(reading == ENDIF) {
+                    if(token == ENDIF) {
 
-                        reading = yylex();
+                        token = yylex();
 
                         return VALID;
 
@@ -264,41 +263,41 @@ int stmt() {
             return INVALID;
         }
 
-    } else if(reading == FOR) {
+    } else if(token == FOR) {
 
-        reading = yylex();
+        token = yylex();
 
-        if(reading == ID) {
+        if(token == ID) {
 
-            reading = yylex();
+            token = yylex();
 
-            if(reading == ASSIGN) {
+            if(token == ASSIGN) {
 
-                reading = yylex();
+                token = yylex();
 
                 if(expr()) {
 
-                    if(reading == STEP) {
+                    if(token == STEP) {
 
-                        reading = yylex();
+                        token = yylex();
 
                         if(expr()) {
 
-                            if(reading == UNTIL) {
+                            if(token == UNTIL) {
 
-                                reading = yylex();
+                                token = yylex();
 
                                 if(expr()) {
 
-                                    if(reading == DO) {
+                                    if(token == DO) {
 
-                                        reading = yylex();
+                                        token = yylex();
 
                                         if(opt_stmts()) {
 
-                                            if(reading == ENDFOR) {
+                                            if(token == ENDFOR) {
 
-                                                reading = yylex();
+                                                token = yylex();
 
                                                 return VALID;
 
@@ -404,27 +403,27 @@ int term() {
 
 int factor() {
 
-    if(reading == ID) {
+    if(token == ID) {
         
-        reading = yylex();
+        token = yylex();
         
         return VALID;
 
-    } else if(reading == NUM) {
+    } else if(token == NUM) {
        
-        reading = yylex();
+        token = yylex();
 
         return VALID;
 
-    } else if(reading == OPEN_PARENTHESIS) {
+    } else if(token == OPEN_PARENTHESIS) {
 
-        reading = yylex();
+        token = yylex();
 
         if(expr()) {
 
-            if(reading == CLOSE_PARENTHESIS) {
+            if(token == CLOSE_PARENTHESIS) {
                 
-                reading = yylex();
+                token = yylex();
 
                 return VALID;
 
@@ -448,9 +447,9 @@ int factor() {
 
 int rb() {
 
-    if(reading == MULTIPLIER || reading == DIVISOR) {
+    if(token == MULTIPLIER || token == DIVISOR) {
 
-        reading = yylex();
+        token = yylex();
         
         if(factor()) {
 
@@ -479,9 +478,9 @@ int rb() {
 
 int ra() {
 
-    if(reading == PLUS || reading == MINUS) {
+    if(token == PLUS || token == MINUS) {
 
-        reading = yylex();
+        token = yylex();
 
         if(term()) {
 
@@ -511,9 +510,9 @@ int expresion() {
 
     if(expr()) {
 
-        if(reading == GREATER_THAN || reading  == LESS_THAN || reading == EQUAL_TO) {
+        if(token == GREATER_THAN || token  == LESS_THAN || token == EQUAL_TO) {
 
-            reading = yylex();
+            token = yylex();
 
             if(expr()) {
 
@@ -541,13 +540,13 @@ int expresion() {
 
 int main() {
 
-    reading = yylex();
+    token = yylex();
 
     int valid = prog();
 
     if(valid) {
         
-        printf("si\n");
+        printf("yes\n");
 
     } else {
 
